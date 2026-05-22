@@ -1,0 +1,69 @@
+@import url('https://fonts.google.com/specimen/Playfair+Display');
+@import url('https://fonts.google.com/specimen/Source+Sans+3');
+
+:root {
+  --color-primary: #1e3d6e;
+  --color-primary-hover: #152b4e;
+  --color-primary-light: #5485d1;
+  --color-secondary: #4a72a8;
+  --color-secondary-hover: #3e5f8c;
+  --color-accent: #c4962a;
+  --color-accent-hover: #a27c23;
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f2f4f7;
+  --color-bg-tertiary: #e8ebef;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #e7ebf0;
+  --color-text: #1f2937;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+  --color-text-inverse: #ffffff;
+  --color-border: #dbdfe5;
+  --color-border-light: #edeff2;
+  --color-success: #14b8a6;
+  --color-success-light: #f0fdfa;
+  --color-warning: #f97316;
+  --color-warning-light: #fff7ed;
+  --color-danger: #dc2626;
+  --color-danger-light: #fef2f2;
+  --color-sidebar-bg: #0d1b30;
+  --color-sidebar-text: #e5e7eb;
+  --color-sidebar-hover: #142848;
+  --color-sidebar-active: #19325a;
+  --color-surface: #f2f4f7;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --border-radius: 4px;
+}
+
+[data-theme="dark"] {
+  --color-primary: #295396;
+  --color-primary-hover: #3265b6;
+  --color-primary-light: #21314a;
+  --color-secondary: #688cbd;
+  --color-secondary-hover: #84a2c9;
+  --color-accent: #d8ad49;
+  --color-accent-hover: #dfbc6b;
+  --color-bg: #111929;
+  --color-bg-secondary: #1f2a39;
+  --color-bg-tertiary: #364152;
+  --color-bg-card: #1f2a39;
+  --color-bg-hover: #354153;
+  --color-text: #f3f4f6;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #9ca3af;
+  --color-text-inverse: #111827;
+  --color-border: #354153;
+  --color-border-light: #495464;
+  --color-success: #5eead4;
+  --color-success-light: #052e16;
+  --color-warning: #fbbf24;
+  --color-warning-light: #451a03;
+  --color-danger: #f87171;
+  --color-danger-light: #450a0a;
+  --color-sidebar-bg: #091220;
+  --color-sidebar-text: #d1d5db;
+  --color-sidebar-hover: #0f1f38;
+  --color-sidebar-active: #295396;
+  --color-surface: #1f2a39;
+}
