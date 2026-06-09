@@ -14,8 +14,8 @@ const site = useSiteStore();
 // ── Site Settings ──
 interface SiteSettings {
   siteName?: string;
-  logo?: { asset?: { url?: string } };
-  darkLogo?: { asset?: { url?: string } };
+  logoLight?: { asset?: { url?: string } };
+  logoDark?: { asset?: { url?: string } };
   ctaLabel?: string;
   ctaUrl?: string;
   ctaHeadline?: string;
@@ -23,28 +23,34 @@ interface SiteSettings {
   ctaFooterLabel?: string;
   ctaFooterUrl?: string;
   copyrightText?: string;
+  description?: string;
+  craftedBy?: string;
 }
 
+// coalesce(logoLight, logo) lets legacy data on the old `logo` field still resolve
+// until the editor moves it to `logoLight`. Same for `logoDark` ← `darkLogo`.
 const { data: settings, loading: settingsLoading } = useSanity<SiteSettings>(
   `*[_type == "siteSettings"][0]{
     siteName,
-    "logo": logo{asset->{url}},
-    "darkLogo": darkLogo{asset->{url}},
+    "logoLight": coalesce(logoLight, logo){asset->{url}},
+    "logoDark": coalesce(logoDark, darkLogo){asset->{url}},
     ctaLabel,
     ctaUrl,
     ctaHeadline,
     ctaSubtext,
     ctaFooterLabel,
     ctaFooterUrl,
-    copyrightText
+    copyrightText,
+    description,
+    craftedBy
   }`
 );
 
 watch(settings, (s) => {
   if (!s) return;
   if (s.siteName) site.name = s.siteName;
-  if (s.logo?.asset?.url) site.logo = s.logo.asset.url;
-  if (s.darkLogo?.asset?.url) site.darkLogo = s.darkLogo.asset.url;
+  if (s.logoLight?.asset?.url) site.logoLight = s.logoLight.asset.url;
+  if (s.logoDark?.asset?.url) site.logoDark = s.logoDark.asset.url;
   if (s.ctaLabel) site.ctaLabel = s.ctaLabel;
   if (s.ctaUrl) site.ctaUrl = s.ctaUrl;
   if (s.ctaHeadline) site.ctaHeadline = s.ctaHeadline;
@@ -52,6 +58,8 @@ watch(settings, (s) => {
   if (s.ctaFooterLabel) site.ctaFooterLabel = s.ctaFooterLabel;
   if (s.ctaFooterUrl) site.ctaFooterUrl = s.ctaFooterUrl;
   if (s.copyrightText) site.copyrightText = s.copyrightText;
+  if (s.description) site.description = s.description;
+  if (s.craftedBy) site.craftedBy = s.craftedBy;
 });
 
 // ── Navigation ──

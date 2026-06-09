@@ -10,6 +10,7 @@ import FaqSection from '@/components/sections/FaqSection.vue'
 import SplitSection from '@/components/sections/SplitSection.vue'
 import ContactSection from '@/components/sections/ContactSection.vue'
 import TextContent from '@/components/sections/TextContent.vue'
+import VideoSection from '@/components/sections/VideoSection.vue'
 import PortfolioSection from '@/components/sections/PortfolioSection.vue'
 import TeamProjectsSection from '@/components/sections/TeamProjectsSection.vue'
 
@@ -26,6 +27,7 @@ export const sectionMap: Record<string, Component> = {
   splitSection: SplitSection,
   contactSection: ContactSection,
   textContent: TextContent,
+  videoSection: VideoSection,
   portfolioSection: PortfolioSection,
   teamProjectsSection: TeamProjectsSection,
 }

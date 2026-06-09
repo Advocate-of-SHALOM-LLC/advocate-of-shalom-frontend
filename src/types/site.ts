@@ -21,8 +21,8 @@ export interface PageMeta {
 
 export interface SiteConfig {
   name: string;
-  logo: string;
-  darkLogo: string;
+  logoLight: string;
+  logoDark: string;
   tagline: string;
   contactEmail: string;
   contactPhone: string;
@@ -34,6 +34,8 @@ export interface SiteConfig {
   ctaFooterLabel: string;
   ctaFooterUrl: string;
   copyrightText: string;
+  description: string;
+  craftedBy: string;
   primaryNav: NavItem[];
   footerNav: NavItem[];
   legalNav: NavItem[];

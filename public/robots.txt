@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /.netlify/
 
-Sitemap: https://advocateofshalom.net/sitemap.xml
+Sitemap: https://advocateofshalom.com/sitemap.xml

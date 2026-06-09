@@ -2,42 +2,42 @@ import { useHead } from '@unhead/vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
-const siteUrl = import.meta.env.VITE_SITE_URL || 'https://advocateofshalom.net';
-const siteName = 'Advocate Of Shalom';
+const siteUrl = import.meta.env.VITE_SITE_URL || 'https://advocateofshalom.com';
+const siteName = 'Advocate Of SHALOM';
 const defaultImage = `${siteUrl}/og-image.png`;
 
 const pageMeta: Record<string, { title: string; description: string }> = {
   '/': {
     title: 'Home',
-    description: 'Advocacy of Shalom helps individuals navigate the criminal justice system and complex agencies — with a team that shows up when it matters most.',
+    description: 'Advocate Of SHALOM helps individuals navigate the criminal justice system and complex agencies — with a team that shows up when it matters most.',
   },
   '/about': {
     title: 'About',
-    description: 'Learn about Advocacy of Shalom — who we are, the mission behind the work, and why we\'re committed to standing up for those who need it most.',
+    description: 'Learn about Advocate Of SHALOM — who we are, the mission behind the work, and why we\'re committed to standing up for those who need it most.',
   },
   '/contact': {
     title: 'Contact',
-    description: 'Whether you\'re seeking support or exploring a partnership, we\'d love to hear from you. Reach out to Advocacy of Shalom today.',
+    description: 'Whether you\'re seeking support or exploring a partnership, we\'d love to hear from you. Reach out to Advocate Of SHALOM today.',
   },
   '/privacy-policy': {
     title: 'Privacy Policy',
-    description: 'Privacy Policy - Advocate Of Shalom',
+    description: 'Privacy Policy - Advocate Of SHALOM',
   },
   '/terms-and-conditions': {
     title: 'Terms & Conditions',
-    description: 'Terms & Conditions - Advocate Of Shalom',
+    description: 'Terms & Conditions - Advocate Of SHALOM',
   },
   '/accessibility': {
     title: 'Accessibility Statement',
-    description: 'Accessibility Statement - Advocate Of Shalom',
+    description: 'Accessibility Statement - Advocate Of SHALOM',
   },
   '/services': {
     title: 'Services',
-    description: 'From criminal justice navigation to DHS advocacy, Advocacy of Shalom provides coordinated support for individuals facing complex systems.',
+    description: 'From criminal justice navigation to DHS advocacy, Advocate Of SHALOM provides coordinated support for individuals facing complex systems.',
   },
   '/partners': {
     title: 'Partners',
-    description: 'Attorneys, social workers, and community providers — learn how partnering with Advocacy of Shalom strengthens the support network for shared clients.',
+    description: 'Attorneys, social workers, and community providers — learn how partnering with Advocate Of SHALOM strengthens the support network for shared clients.',
   },
   '/resources': {
     title: 'Resources',
@@ -48,16 +48,16 @@ const pageMeta: Record<string, { title: string; description: string }> = {
 const schemaJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
-  "name": "Advocate Of Shalom",
-  "url": "https://advocateofshalom.net",
-  "email": "eparker@advocateofshalom.net",
+  "name": "Advocate Of SHALOM",
+  "url": "https://advocateofshalom.com",
+  "email": "eparker@advocateofshalom.com",
   "telephone": "9703147095",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "536 31 1/2 Rd #1",
     "addressLocality": "Grand Junction",
     "addressRegion": "CO",
-    "postalCode": "81501",
+    "postalCode": "81504",
     "addressCountry": "US"
   }
 };

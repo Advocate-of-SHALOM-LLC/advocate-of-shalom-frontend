@@ -3,11 +3,11 @@ import type { SiteConfig } from '@/types/site';
 
 export const useSiteStore = defineStore('site', {
   state: (): SiteConfig => ({
-    name: 'Advocate Of Shalom',
-    logo: '',
-    darkLogo: '',
+    name: 'Advocate Of SHALOM',
+    logoLight: '',
+    logoDark: '',
     tagline: '',
-    contactEmail: 'eparker@advocateofshalom.net',
+    contactEmail: 'eparker@advocateofshalom.com',
     contactPhone: '',
     address: '',
     ctaLabel: 'Get Started',
@@ -17,6 +17,8 @@ export const useSiteStore = defineStore('site', {
     ctaFooterLabel: '',
     ctaFooterUrl: '',
     copyrightText: '',
+    description: '',
+    craftedBy: '',
     primaryNav: [
       { label: 'Home', to: '/' },
       { label: 'About', to: '/about' },

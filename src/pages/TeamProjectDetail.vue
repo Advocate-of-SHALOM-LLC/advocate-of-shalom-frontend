@@ -32,18 +32,18 @@ onMounted(async () => {
 <template>
   <main class="page page--team-project-detail">
     <div v-if="loading" class="py-24 text-center">
-      <p class="text-[var(--color-text-secondary)] text-sm">Loading project...</p>
+      <p class="text-(--color-text-secondary) text-sm">Loading project...</p>
     </div>
 
     <div v-else-if="fetchError" class="py-24 text-center">
-      <h1 class="text-3xl font-bold text-[var(--color-text)] mb-4">Something went wrong</h1>
-      <p class="text-[var(--color-text-secondary)] mb-6">We couldn't load this project. Please try again later.</p>
-      <RouterLink to="/portfolio" aria-label="Go back to portfolio" class="text-[var(--color-primary)] hover:underline font-medium focus-ring rounded">← Back to Portfolio</RouterLink>
+      <h1 class="text-3xl font-bold text-(--color-text) mb-4">Something went wrong</h1>
+      <p class="text-(--color-text-secondary) mb-6">We couldn't load this project. Please try again later.</p>
+      <RouterLink to="/portfolio" aria-label="Go back to portfolio" class="text-(--color-primary) hover:underline font-medium focus-ring rounded">← Back to Portfolio</RouterLink>
     </div>
 
     <div v-else-if="!project" class="py-24 text-center">
-      <h1 class="text-3xl font-bold text-[var(--color-text)] mb-4">Project not found</h1>
-      <RouterLink to="/portfolio" aria-label="Go back to portfolio" class="text-[var(--color-primary)] hover:underline font-medium focus-ring rounded">← Back to Portfolio</RouterLink>
+      <h1 class="text-3xl font-bold text-(--color-text) mb-4">Project not found</h1>
+      <RouterLink to="/portfolio" aria-label="Go back to portfolio" class="text-(--color-primary) hover:underline font-medium focus-ring rounded">← Back to Portfolio</RouterLink>
     </div>
 
     <template v-else>
@@ -58,18 +58,18 @@ onMounted(async () => {
       <article class="py-16 px-6">
         <div class="max-w-3xl mx-auto">
           <nav class="mb-10">
-            <RouterLink to="/portfolio" aria-label="Go back to portfolio" class="inline-flex items-center gap-1 text-sm text-[var(--color-primary)] hover:underline font-medium rounded focus-ring">
+            <RouterLink to="/portfolio" aria-label="Go back to portfolio" class="inline-flex items-center gap-1 text-sm text-(--color-primary) hover:underline font-medium rounded focus-ring">
               ← Back to Portfolio
             </RouterLink>
           </nav>
 
-          <span v-if="project.category" class="inline-block text-[0.8125rem] font-semibold uppercase tracking-widest text-[var(--color-primary)] mb-3 pb-1 border-b border-[var(--color-border)]">{{ project.category }}</span>
+          <span v-if="project.category" class="inline-block text-[0.8125rem] font-semibold uppercase tracking-widest text-(--color-primary) mb-3 pb-1 border-b border-(--color-border)">{{ project.category }}</span>
 
-          <h1 class="text-4xl md:text-5xl font-extrabold text-[var(--color-text)] leading-tight mb-6" style="font-family: var(--font-heading)">{{ project.title }}</h1>
+          <h1 class="text-4xl md:text-5xl font-extrabold text-(--color-text) leading-tight mb-6" style="font-family: var(--font-heading)">{{ project.title }}</h1>
 
-          <p v-if="project.description" class="text-lg text-[var(--color-text-secondary)] leading-relaxed mb-10">{{ project.description }}</p>
+          <p v-if="project.description" class="text-lg text-(--color-text-secondary) leading-relaxed mb-10">{{ project.description }}</p>
 
-          <div v-if="project.body" class="legal-content text-[var(--color-text-secondary)]">
+          <div v-if="project.body" class="legal-content text-(--color-text-secondary)">
             <PortableText :value="project.body" />
           </div>
         </div>

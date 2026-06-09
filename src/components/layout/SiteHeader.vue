@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import { Menu, X, Sun, Moon } from 'lucide-vue-next';
 import { useSiteStore } from '@/stores/useSiteStore';
-import SmartLink from '@/components/ui/SmartLink.vue';
 import { useTheme } from '@/composables/useTheme';
 
 const site = useSiteStore();
 const { theme, toggle } = useTheme();
 const mobileOpen = ref(false);
+
+// Use dark variant when in dark mode; fall back to logoLight if logoDark not uploaded
+const activeLogo = computed(() =>
+  theme.value === 'dark' && site.logoDark ? site.logoDark : site.logoLight
+);
 </script>
 
 <template>
@@ -16,7 +20,7 @@ const mobileOpen = ref(false);
     <div class="site-header__inner">
       <!-- Left: Logo -->
       <RouterLink to="/" class="site-header__logo" @click="mobileOpen = false">
-        <img v-if="site.logo" :src="site.logo" :alt="site.name" class="site-header__logo-img" />
+        <img v-if="activeLogo" :src="activeLogo" :alt="site.name" class="site-header__logo-img" />
         <span v-else>{{ site.name }}</span>
       </RouterLink>
 
@@ -31,28 +35,10 @@ const mobileOpen = ref(false);
         >
           {{ item.label }}
         </RouterLink>
-
-        <!-- CTA inside mobile menu -->
-        <SmartLink
-          v-if="site.ctaLabel"
-          :to="site.ctaUrl"
-          class="site-header__cta site-header__cta--mobile"
-          @click="mobileOpen = false"
-        >
-          {{ site.ctaLabel }}
-        </SmartLink>
       </nav>
 
-      <!-- Right: CTA + theme toggle + hamburger -->
+      <!-- Right: theme toggle + hamburger -->
       <div class="site-header__actions">
-        <SmartLink
-          v-if="site.ctaLabel"
-          :to="site.ctaUrl"
-          class="site-header__cta site-header__cta--desktop"
-        >
-          {{ site.ctaLabel }}
-        </SmartLink>
-
         <button
           class="site-header__theme-toggle"
           :aria-label="`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`"
@@ -88,7 +74,7 @@ const mobileOpen = ref(false);
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
-  height: 4rem;
+  height: 5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,9 +95,10 @@ const mobileOpen = ref(false);
 }
 
 .site-header__logo-img {
-  height: 2rem;
+  height: 3.25rem;
   width: auto;
   object-fit: contain;
+  display: block;
 }
 
 .site-header__nav {
@@ -137,27 +124,6 @@ const mobileOpen = ref(false);
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
-}
-
-.site-header__cta {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1.25rem;
-  background-color: var(--color-primary);
-  color: var(--color-text-inverse);
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: var(--border-radius);
-  transition: background-color 0.2s ease;
-}
-
-.site-header__cta:hover {
-  background-color: var(--color-primary-hover, var(--color-secondary));
-  color: var(--color-text-inverse);
-}
-
-.site-header__cta--mobile {
-  display: none;
 }
 
 .site-header__theme-toggle {
@@ -190,14 +156,10 @@ const mobileOpen = ref(false);
     display: flex;
   }
 
-  .site-header__cta--desktop {
-    display: none;
-  }
-
   .site-header__nav {
     display: none;
     position: absolute;
-    top: 4rem;
+    top: 5rem;
     left: 0;
     right: 0;
     flex-direction: column;
@@ -209,12 +171,6 @@ const mobileOpen = ref(false);
 
   .site-header__nav--open {
     display: flex;
-  }
-
-  .site-header__cta--mobile {
-    display: inline-flex;
-    margin-top: 0.5rem;
-    justify-content: center;
   }
 
   .site-header__link {

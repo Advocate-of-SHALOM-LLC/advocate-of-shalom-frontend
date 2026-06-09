@@ -5,18 +5,12 @@
     class="ambience-hero"
     aria-hidden="true"
   >
-    <svg class="ambience-shape" width="100%" height="100%" viewBox="0 0 1440 600" preserveAspectRatio="none" aria-hidden="true">
-      <g transform="rotate(-31.9 720 300)">
-        <line x1="1100" y1="-20" x2="800" y2="620" stroke="white" stroke-width="1" opacity="0.077" />
-        <line x1="1128" y1="-20" x2="828" y2="620" stroke="white" stroke-width="1" opacity="0.077" />
-        <line x1="1156" y1="-20" x2="856" y2="620" stroke="white" stroke-width="1" opacity="0.077" />
-        <line x1="1184" y1="-20" x2="884" y2="620" stroke="white" stroke-width="1" opacity="0.077" />
-        <line x1="1212" y1="-20" x2="912" y2="620" stroke="white" stroke-width="1" opacity="0.077" />
-        <line x1="207" y1="-20" x2="7" y2="620" stroke="white" stroke-width="0.75" opacity="0.054" />
-        <line x1="235" y1="-20" x2="35" y2="620" stroke="white" stroke-width="0.75" opacity="0.054" />
-        <line x1="263" y1="-20" x2="63" y2="620" stroke="white" stroke-width="0.75" opacity="0.054" />
-      </g>
-    </svg>
+    <img
+      src="/swallows.svg"
+      alt=""
+      aria-hidden="true"
+      class="ambience-swallows"
+    />
   </div>
 
   <!-- CTA ambience layer — corner accents on CTA blocks -->
@@ -50,6 +44,37 @@ defineProps<{ variant: 'hero' | 'cta' }>()
 }
 .ambience-shape:nth-child(2) {
   animation-delay: -6s;
+}
+
+@keyframes swallowsDrift {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-10px); }
+}
+.ambience-swallows {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  width: clamp(180px, 28vw, 360px);
+  height: auto;
+  /* Source asset is baked-in navy on transparent — convert to soft white */
+  filter: brightness(0) invert(1) opacity(0.22);
+  pointer-events: none;
+  animation: swallowsDrift 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (max-width: 640px) {
+  .ambience-swallows {
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambience-shape,
+  .ambience-swallows {
+    animation: none;
+  }
 }
 
 .ambience-hero {
