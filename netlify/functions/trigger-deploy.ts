@@ -4,6 +4,9 @@ import type { Handler } from '@netlify/functions';
 // from the Sanity Studio "Deploy Site" tool. The shared secret in the
 // `x-deploy-secret` header protects the endpoint from anonymous abuse.
 //
+// Accepts an optional JSON body { "target": "staging" | "production" }.
+// Defaults to "production" if absent for backward compatibility.
+//
 // Studio is hosted on *.sanity.studio (a different origin), so this function
 // needs to permit cross-origin requests.
 
@@ -14,6 +17,8 @@ const CORS_HEADERS = {
 };
 
 const JSON_HEADERS = { ...CORS_HEADERS, 'Content-Type': 'application/json' };
+
+type Target = 'production' | 'staging';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -29,12 +34,29 @@ export const handler: Handler = async (event) => {
     return { statusCode: 401, headers: JSON_HEADERS, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
 
-  const hookUrl = process.env.NETLIFY_DEPLOY_HOOK_URL;
+  // Parse target from body; default to production for backward compat.
+  let target: Target = 'production';
+  if (event.body) {
+    try {
+      const parsed = JSON.parse(event.body);
+      if (parsed?.target === 'staging') target = 'staging';
+    } catch {
+      // Malformed body — treat as no body. Default applies.
+    }
+  }
+
+  const hookUrl =
+    target === 'staging'
+      ? process.env.NETLIFY_STAGING_DEPLOY_HOOK_URL
+      : process.env.NETLIFY_DEPLOY_HOOK_URL;
+
   if (!hookUrl) {
+    const envVarName =
+      target === 'staging' ? 'NETLIFY_STAGING_DEPLOY_HOOK_URL' : 'NETLIFY_DEPLOY_HOOK_URL';
     return {
       statusCode: 500,
       headers: JSON_HEADERS,
-      body: JSON.stringify({ error: 'NETLIFY_DEPLOY_HOOK_URL not configured' }),
+      body: JSON.stringify({ error: `${envVarName} not configured` }),
     };
   }
 
@@ -51,6 +73,7 @@ export const handler: Handler = async (event) => {
         body: JSON.stringify({
           error: 'Netlify build hook returned non-200',
           status: response.status,
+          target,
         }),
       };
     }
@@ -58,13 +81,17 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 200,
       headers: JSON_HEADERS,
-      body: JSON.stringify({ triggered: true, timestamp: new Date().toISOString() }),
+      body: JSON.stringify({
+        triggered: true,
+        target,
+        timestamp: new Date().toISOString(),
+      }),
     };
   } catch (err) {
     return {
       statusCode: 500,
       headers: JSON_HEADERS,
-      body: JSON.stringify({ error: 'Failed to trigger deploy', detail: String(err) }),
+      body: JSON.stringify({ error: 'Failed to trigger deploy', detail: String(err), target }),
     };
   }
 };
