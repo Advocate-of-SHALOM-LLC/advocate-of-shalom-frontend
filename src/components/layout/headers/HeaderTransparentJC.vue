@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useSiteStore } from '@/stores/useSiteStore';
+import { useTheme } from '@/composables/useTheme';
 
 const site = useSiteStore();
+const { theme } = useTheme();
 
 const navItems = computed(() => site.headerNav || []);
 const volunteerUrl = computed(() => site.volunteerUrl || site.ctaUrl || '/forms/volunteer');
 const donateUrl = computed(() => site.donateUrl || '/donate');
-const logoSrc = computed(() => site.logo || '');
+const logoSrc = computed(() =>
+  (theme.value === 'dark' && site.logoDark ? site.logoDark : site.logoLight) || ''
+);
 const logoAlt = computed(() => site.name || 'Home');
 
 const menuOpen = ref(false);
