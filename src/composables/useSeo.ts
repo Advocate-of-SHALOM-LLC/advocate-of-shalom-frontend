@@ -50,8 +50,8 @@ const schemaJsonLd = {
   "@type": "ProfessionalService",
   "name": "Advocate Of SHALOM",
   "url": "https://advocateofshalom.com",
-  "email": "eparker@advocateofshalom.com",
-  "telephone": "9703147095",
+  "email": "navigator@advocateofshalom.com",
+  "telephone": "9707735907",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "536 31 1/2 Rd #1",

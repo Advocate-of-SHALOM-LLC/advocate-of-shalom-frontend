@@ -7,7 +7,7 @@ export const useSiteStore = defineStore('site', {
     logoLight: '',
     logoDark: '',
     tagline: '',
-    contactEmail: 'eparker@advocateofshalom.com',
+    contactEmail: 'navigator@advocateofshalom.com',
     contactPhone: '',
     address: '',
     ctaLabel: 'Get Started',

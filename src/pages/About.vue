@@ -2,21 +2,22 @@
 import { computed } from 'vue';
 import { useSanity } from '@/composables/useSanity';
 import { useRevealObserver } from '@/composables/useRevealObserver';
-import { useStoryVersion } from '@/composables/useStoryVersion';
 import { sanityImage } from '@/composables/useSanityImage';
 import HeroSection from '@/components/sections/HeroSection.vue';
 import SmartLink from '@/components/ui/SmartLink.vue';
-import FloatingVersionToggle from '@/components/ui/FloatingVersionToggle.vue';
 
+// The About page renders the Professional Framing version only. The Sanity
+// schema still carries the Full/Alludes duplicates + storyVersion toggle
+// (kept in place for editorial flexibility), but the frontend ignores them.
 const aboutQuery = `*[_type == "aboutPage"][0]{
-  storyVersion,
   heroImage,
   heroImageAlt,
-  heroHeadlineFull, heroSubheadlineFull,
-  heroHeadlineAlludes, heroSubheadlineAlludes,
-  originStoryFull, originStoryAlludes,
-  teamBioImage, teamBioImageAlt,
-  teamBioFull, teamBioAlludes,
+  heroHeadlineAlludes,
+  heroSubheadlineAlludes,
+  originStoryAlludes,
+  teamBioImage,
+  teamBioImageAlt,
+  teamBioAlludes,
   approachHeading, approachBody,
   whoWeServeHeading, whoWeServeBody,
   ctaHeading, ctaSubline, ctaButtonLabel, ctaButtonUrl
@@ -25,35 +26,19 @@ const aboutQuery = `*[_type == "aboutPage"][0]{
 const { data: page } = useSanity(aboutQuery);
 useRevealObserver(page);
 
-// Preview-time override (driven by the floating toggle, persisted in localStorage).
-const { override, setOverride } = useStoryVersion();
-
-// Effective version: preview override wins; otherwise the value published in Sanity;
-// final fallback is 'alludes' (Professional Framing).
-const version = computed(() => {
-  if (override.value === 'full' || override.value === 'alludes') return override.value;
-  return page.value?.storyVersion === 'full' ? 'full' : 'alludes';
-});
-
 const heroSection = computed(() => {
   if (!page.value) return null;
-  const isFull = version.value === 'full';
   return {
     _type: 'heroSection',
-    title: isFull ? page.value.heroHeadlineFull : page.value.heroHeadlineAlludes,
-    subtitle: isFull ? page.value.heroSubheadlineFull : page.value.heroSubheadlineAlludes,
+    title: page.value.heroHeadlineAlludes,
+    subtitle: page.value.heroSubheadlineAlludes,
     image: page.value.heroImage,
     imageAlt: page.value.heroImageAlt,
   };
 });
 
-const originStory = computed(() =>
-  version.value === 'full' ? page.value?.originStoryFull : page.value?.originStoryAlludes
-);
-
-const teamBio = computed(() =>
-  version.value === 'full' ? page.value?.teamBioFull : page.value?.teamBioAlludes
-);
+const originStory = computed(() => page.value?.originStoryAlludes);
+const teamBio = computed(() => page.value?.teamBioAlludes);
 
 const teamBioImage = computed(() => {
   const img = page.value?.teamBioImage;
@@ -137,14 +122,6 @@ const hasSplit = computed(
         </SmartLink>
       </div>
     </section>
-
-    <FloatingVersionToggle
-      v-if="page"
-      :current="version"
-      label-full="Full Story"
-      label-alludes="Professional"
-      @change="setOverride"
-    />
   </main>
 </template>
 

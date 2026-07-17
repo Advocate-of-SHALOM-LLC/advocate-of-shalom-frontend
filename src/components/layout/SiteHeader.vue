@@ -108,15 +108,33 @@ const activeLogo = computed(() =>
 }
 
 .site-header__link {
+  position: relative;
   color: var(--color-text);
   font-size: 0.9375rem;
   font-weight: 500;
+  padding: 0.25rem 0;
   transition: color 0.2s ease;
 }
 
-.site-header__link:hover,
-.site-header__link.router-link-active {
+.site-header__link:hover {
   color: var(--color-primary);
+}
+
+/* Active-page indicator. Uses exact-active so the Home link ("/") only
+   lights up on the home route, not everywhere (every path starts with /). */
+.site-header__link.router-link-exact-active {
+  color: var(--color-primary);
+}
+
+.site-header__link.router-link-exact-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background-color: var(--color-accent);
+  border-radius: 1px;
 }
 
 .site-header__actions {
