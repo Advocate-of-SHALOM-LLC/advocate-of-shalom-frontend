@@ -6,18 +6,20 @@ import { sanityImage } from '@/composables/useSanityImage';
 import HeroSection from '@/components/sections/HeroSection.vue';
 import SmartLink from '@/components/ui/SmartLink.vue';
 
-// The About page renders the Professional Framing version only. The Sanity
-// schema still carries the Full/Alludes duplicates + storyVersion toggle
-// (kept in place for editorial flexibility), but the frontend ignores them.
+// The About page schema was simplified — no more Full/Alludes twin fields
+// or storyVersion toggle. The coalesce() calls below let the site keep
+// rendering old-shape docs during the transition (before the migration
+// patch script has run); once every live doc has been migrated to the
+// clean field names, the fallbacks are no-ops and can be dropped.
 const aboutQuery = `*[_type == "aboutPage"][0]{
   heroImage,
   heroImageAlt,
-  heroHeadlineAlludes,
-  heroSubheadlineAlludes,
-  originStoryAlludes,
+  "heroHeadline": coalesce(heroHeadline, heroHeadlineAlludes),
+  "heroSubheadline": coalesce(heroSubheadline, heroSubheadlineAlludes),
+  "originStory": coalesce(originStory, originStoryAlludes),
   teamBioImage,
   teamBioImageAlt,
-  teamBioAlludes,
+  "teamBio": coalesce(teamBio, teamBioAlludes),
   approachHeading, approachBody,
   whoWeServeHeading, whoWeServeBody,
   ctaHeading, ctaSubline, ctaButtonLabel, ctaButtonUrl
@@ -30,15 +32,15 @@ const heroSection = computed(() => {
   if (!page.value) return null;
   return {
     _type: 'heroSection',
-    title: page.value.heroHeadlineAlludes,
-    subtitle: page.value.heroSubheadlineAlludes,
+    title: page.value.heroHeadline,
+    subtitle: page.value.heroSubheadline,
     image: page.value.heroImage,
     imageAlt: page.value.heroImageAlt,
   };
 });
 
-const originStory = computed(() => page.value?.originStoryAlludes);
-const teamBio = computed(() => page.value?.teamBioAlludes);
+const originStory = computed(() => page.value?.originStory);
+const teamBio = computed(() => page.value?.teamBio);
 
 const teamBioImage = computed(() => {
   const img = page.value?.teamBioImage;
