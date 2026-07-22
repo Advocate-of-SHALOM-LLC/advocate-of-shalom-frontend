@@ -140,7 +140,7 @@ const safeEmbedUrl = computed(() => {
             </label>
 
             <label class="contact-form__field">
-              <span class="contact-form__label">How can we help you? <span aria-hidden="true" class="contact-form__required">*</span></span>
+              <span class="contact-form__label">How can we help your organization or your clients? <span aria-hidden="true" class="contact-form__required">*</span></span>
               <textarea
                 v-model="form.message"
                 required
