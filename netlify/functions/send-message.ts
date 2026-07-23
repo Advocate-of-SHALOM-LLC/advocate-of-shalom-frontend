@@ -1,5 +1,8 @@
 import type { Context } from '@netlify/functions';
 import { Resend } from 'resend';
+import { initSentry, captureError } from '../lib/sentry';
+
+initSentry();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -74,6 +77,16 @@ export default async (req: Request, _context: Context) => {
 
     if (error) {
       console.error('Resend error:', error);
+      // Resend rejected the send — this is a real production incident
+      // (API key rotated, sender domain unverified, quota exceeded, etc).
+      await captureError(error, {
+        function: 'send-message',
+        stage: 'resend.send',
+        // Don't include the message body — sensitive user content.
+        // Just the sender/recipient metadata for triage.
+        to: TO_EMAIL,
+        from: FROM_EMAIL,
+      });
       return new Response(JSON.stringify({ error: 'Failed to send message. Please try again.' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -86,6 +99,9 @@ export default async (req: Request, _context: Context) => {
     });
   } catch (err) {
     console.error('Send message error:', err);
+    // Any uncaught exception here is a bug worth waking someone up for —
+    // JSON parse failures, unexpected Resend SDK errors, etc.
+    await captureError(err, { function: 'send-message', stage: 'handler' });
     return new Response(JSON.stringify({ error: 'An unexpected error occurred.' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

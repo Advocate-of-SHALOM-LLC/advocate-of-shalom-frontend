@@ -1,4 +1,7 @@
 import type { Handler } from '@netlify/functions';
+import { initSentry, captureError } from '../lib/sentry';
+
+initSentry();
 
 // Triggers a Netlify build by POSTing to the configured build hook. Called
 // from the Sanity Studio "Deploy Site" tool. The shared secret in the
@@ -53,6 +56,13 @@ export const handler: Handler = async (event) => {
   if (!hookUrl) {
     const envVarName =
       target === 'staging' ? 'NETLIFY_STAGING_DEPLOY_HOOK_URL' : 'NETLIFY_DEPLOY_HOOK_URL';
+    // Config bug — someone rotated env vars without setting the hook URL.
+    // Worth an alert so it doesn't sit broken until someone tries the button.
+    await captureError(new Error(`Missing env var: ${envVarName}`), {
+      function: 'trigger-deploy',
+      stage: 'config-check',
+      target,
+    });
     return {
       statusCode: 500,
       headers: JSON_HEADERS,
@@ -67,6 +77,15 @@ export const handler: Handler = async (event) => {
     });
 
     if (!response.ok) {
+      // Netlify's build hook API rejected us — invalid/rotated hook URL, or
+      // Netlify itself is degraded. Either way it's a real deploy-button
+      // failure worth alerting on.
+      await captureError(new Error(`Netlify build hook returned ${response.status}`), {
+        function: 'trigger-deploy',
+        stage: 'hook.response',
+        target,
+        status: response.status,
+      });
       return {
         statusCode: 502,
         headers: JSON_HEADERS,
@@ -88,6 +107,8 @@ export const handler: Handler = async (event) => {
       }),
     };
   } catch (err) {
+    // Network error reaching Netlify, DNS failure, etc.
+    await captureError(err, { function: 'trigger-deploy', stage: 'hook.fetch', target });
     return {
       statusCode: 500,
       headers: JSON_HEADERS,
