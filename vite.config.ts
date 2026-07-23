@@ -28,9 +28,13 @@ export default defineConfig({
     }),
   ],
   build: {
-    // Only generate source maps when Sentry can consume them; otherwise
-    // maps would leak into the deployed dist/ with nowhere useful to go.
-    sourcemap: sentryEnabled,
+    // 'hidden' generates .map files (so the Sentry plugin can upload them)
+    // but omits the //# sourceMappingURL= comment from the .js output. Without
+    // that comment, browsers don't try to fetch the .map files we then delete
+    // — no 404 chase, no "source map error" DevTools noise. Sentry doesn't
+    // need the comment either; it resolves stack traces server-side using the
+    // maps we uploaded.
+    sourcemap: sentryEnabled ? 'hidden' : false,
   },
   resolve: {
     alias: {
