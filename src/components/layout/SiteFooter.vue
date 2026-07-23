@@ -52,6 +52,24 @@ function isExternal(url: string) {
   return /^(https?:)?\/\//.test(url);
 }
 
+// ── NAP (Name / Address / Phone / Email) from Sanity contactPage ───────
+// Powers the "Get In Touch" block in the brand column. Sourced from the
+// contact page's map block so there's a single canonical NAP in the CMS.
+interface ContactInfo {
+  mapAddress?: string;
+  mapPhone?: string;
+  mapEmail?: string;
+}
+const { data: contactInfo } = useSanity<ContactInfo>(
+  `*[_type == "contactPage"][0]{ mapAddress, mapPhone, mapEmail }`
+);
+const address = computed(() => contactInfo.value?.mapAddress || '');
+const phone = computed(() => contactInfo.value?.mapPhone || '');
+const email = computed(() => contactInfo.value?.mapEmail || '');
+const phoneHref = computed(() => `tel:${phone.value.replace(/[^0-9+]/g, '')}`);
+const emailHref = computed(() => `mailto:${email.value}`);
+const hasNap = computed(() => !!(address.value || phone.value || email.value));
+
 // ── Social links from Sanity ───────────────────────────────────────────
 interface SocialLink {
   platform: string;
@@ -88,6 +106,7 @@ const platformLabels: Record<string, string> = {
   linkedin: 'LinkedIn',
   youtube: 'YouTube',
   tiktok: 'TikTok',
+  google: 'Google Business Profile',
 };
 </script>
 
@@ -97,10 +116,22 @@ const platformLabels: Record<string, string> = {
     <div class="stack">
       <div class="stack__inner">
         <div class="stack__cols">
-          <!-- Brand column: org name + description + social row -->
+          <!-- Brand column: org name + description + NAP + social row -->
           <div class="stack__brand">
             <p class="stack__name">{{ site.name }}</p>
             <p v-if="site.description" class="stack__desc">{{ site.description }}</p>
+
+            <!-- NAP block — canonical contact info for local SEO + user access -->
+            <div v-if="hasNap" class="stack__nap" itemscope itemtype="https://schema.org/ProfessionalService">
+              <h2 class="stack__nap-heading">Get In Touch</h2>
+              <address v-if="address" class="stack__nap-address whitespace-pre-line" itemprop="address">{{ address }}</address>
+              <p v-if="phone" class="stack__nap-line">
+                <a :href="phoneHref" class="stack__nap-link" itemprop="telephone">{{ phone }}</a>
+              </p>
+              <p v-if="email" class="stack__nap-line">
+                <a :href="emailHref" class="stack__nap-link" itemprop="email">{{ email }}</a>
+              </p>
+            </div>
 
             <div v-if="socialLinks.length" class="stack__social">
               <a
@@ -119,6 +150,16 @@ const platformLabels: Record<string, string> = {
                   stroke-width="2"
                 />
                 <span v-else-if="link.platform === 'tiktok'" class="stack__social-text-mark" aria-hidden="true">TK</span>
+                <svg
+                  v-else-if="link.platform === 'google'"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
+                </svg>
                 <span v-else class="stack__social-text-mark" aria-hidden="true">{{ link.platform.charAt(0).toUpperCase() }}</span>
               </a>
             </div>
@@ -227,6 +268,49 @@ const platformLabels: Record<string, string> = {
   color: #d1d5db;
   max-width: 32rem;
   margin: 0;
+}
+
+/* NAP block — visible contact info for local SEO + user access */
+.stack__nap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.stack__nap-heading {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 0.25rem;
+}
+
+.stack__nap-address,
+.stack__nap-line {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #d1d5db;
+  font-style: normal;
+}
+
+.stack__nap-link {
+  color: #d1d5db;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.stack__nap-link:hover {
+  color: #ffffff;
+}
+
+.stack__nap-link:focus-visible {
+  outline: 3px dashed rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* Link columns wrapper — stacks on mobile, row on desktop */

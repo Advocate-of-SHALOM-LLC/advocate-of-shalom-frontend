@@ -1,81 +1,129 @@
 import { useHead } from '@unhead/vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useSanity } from '@/composables/useSanity';
 
 const siteUrl = import.meta.env.VITE_SITE_URL || 'https://advocateofshalom.com';
 const siteName = 'Advocate Of SHALOM';
+const siteLocation = 'Grand Junction, CO';
+const siteDescription =
+  'Holistic advocacy for individuals navigating the criminal justice system, reentry, and complex government agencies — based in Grand Junction, Colorado.';
 const defaultImage = `${siteUrl}/og-image.png`;
 
 const pageMeta: Record<string, { title: string; description: string }> = {
   '/': {
     title: 'Home',
-    description: 'Advocate Of SHALOM helps individuals navigate the criminal justice system and complex agencies — with a team that shows up when it matters most.',
+    description:
+      'Advocate Of SHALOM helps individuals navigate the criminal justice system and complex agencies — with a team that shows up when it matters most. Based in Grand Junction, CO.',
   },
   '/about': {
     title: 'About',
-    description: 'Learn about Advocate Of SHALOM — who we are, the mission behind the work, and why we\'re committed to standing up for those who need it most.',
+    description:
+      "Learn about Advocate Of SHALOM — who we are, the mission behind the work, and why we're committed to standing up for those who need it most.",
   },
   '/contact': {
     title: 'Contact',
-    description: 'Whether you\'re seeking support or exploring a partnership, we\'d love to hear from you. Reach out to Advocate Of SHALOM today.',
+    description:
+      "Whether you're seeking support or exploring a partnership, we'd love to hear from you. Reach out to Advocate Of SHALOM today.",
   },
   '/privacy-policy': {
     title: 'Privacy Policy',
-    description: 'Privacy Policy - Advocate Of SHALOM',
+    description:
+      'How Advocate Of SHALOM collects, uses, and protects your information. Read our full privacy policy.',
   },
   '/terms-and-conditions': {
     title: 'Terms & Conditions',
-    description: 'Terms & Conditions - Advocate Of SHALOM',
+    description:
+      'The terms of use governing your access to advocateofshalom.com — including intellectual property, disclaimers, and limitations of liability.',
   },
   '/accessibility': {
     title: 'Accessibility Statement',
-    description: 'Accessibility Statement - Advocate Of SHALOM',
+    description:
+      'Advocate Of SHALOM is committed to digital accessibility. Read our full accessibility statement and how to report barriers.',
   },
   '/services': {
     title: 'Services',
-    description: 'From criminal justice navigation to DHS advocacy, Advocate Of SHALOM provides coordinated support for individuals facing complex systems.',
+    description:
+      'From criminal justice navigation to DHS advocacy, Advocate Of SHALOM provides coordinated support for individuals facing complex systems in Grand Junction and across Colorado.',
   },
   '/partners': {
     title: 'Partners',
-    description: 'Attorneys, social workers, and community providers — learn how partnering with Advocate Of SHALOM strengthens the support network for shared clients.',
+    description:
+      'Attorneys, social workers, and community providers — learn how partnering with Advocate Of SHALOM strengthens the support network for shared clients.',
   },
   '/resources': {
     title: 'Resources',
-    description: 'Guides, links, and practical information to help individuals and professionals navigate the criminal justice system and complex government agencies.',
+    description:
+      'Guides, links, and practical information to help individuals and professionals navigate the criminal justice system and complex government agencies in Colorado.',
   },
-};
-
-const schemaJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "Advocate Of SHALOM",
-  "url": "https://advocateofshalom.com",
-  "email": "navigator@advocateofshalom.com",
-  "telephone": "9707735907",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "536 31 1/2 Rd #1",
-    "addressLocality": "Grand Junction",
-    "addressRegion": "CO",
-    "postalCode": "81504",
-    "addressCountry": "US"
-  }
 };
 
 export function useSeo() {
   const route = useRoute();
 
+  // Pull social profile URLs from Sanity for JSON-LD sameAs.
+  const { data: socialData } = useSanity<Array<{ url: string }>>(
+    `*[_type == "socialLinks"] | order(order asc, _createdAt asc) { url }`
+  );
+
   const meta = computed(() => pageMeta[route.path] || {
     title: siteName,
-    description: 'Purpose-driven solutions from ' + siteName + '.',
+    description: siteDescription,
   });
 
+  // Titles read: "{Page} | Advocate Of SHALOM | Grand Junction, CO"
+  // Falls back to just the site name + location when a page uses the site name
+  // as its title (e.g. the home fallback).
   const fullTitle = computed(() => {
     const t = meta.value.title;
-    return t.includes(siteName) ? t : `${t} | ${siteName}`;
+    if (t === siteName || t.includes(siteName)) return `${siteName} | ${siteLocation}`;
+    return `${t} | ${siteName} | ${siteLocation}`;
   });
 
   const canonicalUrl = computed(() => `${siteUrl}${route.path === '/' ? '' : route.path}`);
+
+  // Reactive JSON-LD — enriched with logo, image, description, areaServed,
+  // openingHours, and sameAs (populated from Sanity when social links load).
+  const jsonLd = computed(() => {
+    const sameAs = (socialData.value ?? [])
+      .map((s) => s?.url)
+      .filter((u): u is string => typeof u === 'string' && u.length > 0);
+
+    const doc: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': 'ProfessionalService',
+      name: siteName,
+      url: siteUrl,
+      description: siteDescription,
+      logo: `${siteUrl}/apple-touch-icon.png`,
+      image: defaultImage,
+      email: 'navigator@advocateofshalom.com',
+      telephone: '9707735907',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '536 31 1/2 Rd #1',
+        addressLocality: 'Grand Junction',
+        addressRegion: 'CO',
+        postalCode: '81504',
+        addressCountry: 'US',
+      },
+      areaServed: {
+        '@type': 'AdministrativeArea',
+        name: 'Grand Valley, Colorado',
+      },
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '09:00',
+          closes: '17:00',
+        },
+      ],
+    };
+
+    if (sameAs.length > 0) doc.sameAs = sameAs;
+    return doc;
+  });
 
   useHead({
     title: fullTitle,
@@ -99,7 +147,7 @@ export function useSeo() {
     script: [
       {
         type: 'application/ld+json',
-        innerHTML: JSON.stringify(schemaJsonLd),
+        innerHTML: computed(() => JSON.stringify(jsonLd.value)),
       },
     ],
   });

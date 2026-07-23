@@ -10,6 +10,17 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    # Content-Security-Policy — restricts what content the page can load.
+    # 'unsafe-inline' on script/style is required for @unhead's JSON-LD injection
+    # and Vue's scoped/dynamic styles; explored alternatives (nonce, hash) are
+    # impractical for a Vite SPA + JSON-LD that changes per page.
+    # Allowed external origins per resource type:
+    #   - Sanity CMS: cdn.sanity.io (images), *.sanity.io (API)
+    #   - Fonts: fonts.googleapis.com (CSS), fonts.gstatic.com (files)
+    #   - Analytics: sa.advocateofshalom.com (Simple Analytics tracker)
+    #   - Video embeds: youtube.com, player.vimeo.com
+    #   - Google Maps embed: www.google.com
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://sa.advocateofshalom.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://cdn.sanity.io https://sa.advocateofshalom.com; connect-src 'self' https://vi40cipr.api.sanity.io https://vi40cipr.apicdn.sanity.io; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'"
 
 [[headers]]
   for = "/assets/*"
