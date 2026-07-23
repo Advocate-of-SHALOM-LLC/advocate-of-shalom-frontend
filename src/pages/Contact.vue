@@ -28,6 +28,7 @@ const platformLabels = {
   facebook: 'Facebook', instagram: 'Instagram', twitter: 'X', linkedin: 'LinkedIn',
   youtube: 'YouTube', tiktok: 'TikTok', github: 'GitHub', pinterest: 'Pinterest',
   threads: 'Threads', bluesky: 'Bluesky', mastodon: 'Mastodon', nextdoor: 'Nextdoor',
+  google: 'Google Business Profile',
 };
 
 // ── Form state ──
