@@ -24,7 +24,7 @@ export function initSentry(): void {
 
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
-    environment: process.env.SENTRY_ENVIRONMENT || 'production',
+    environment: process.env.SENTRY_ENV || 'production',
     // Backend traces per user action (form submits, deploy button clicks),
     // not per page load — volume is naturally low, so 100% is fine.
     tracesSampleRate: 1.0,
