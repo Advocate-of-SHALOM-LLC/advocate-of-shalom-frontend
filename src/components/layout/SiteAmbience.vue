@@ -6,10 +6,12 @@
     aria-hidden="true"
   >
     <img
-      src="/swallows.svg"
+      src="/swallows.webp"
       alt=""
       aria-hidden="true"
       class="ambience-swallows"
+      loading="lazy"
+      decoding="async"
     />
   </div>
 

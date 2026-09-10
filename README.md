@@ -74,8 +74,11 @@ netlify/
     trigger-deploy.ts  Studio Deploy Site button → Netlify build hook
 
 public/
-  swallows.svg                   hero ambience overlay
-  advocate-of-shalom-logo-1769x590.png   wordmark + birds, navy
+  swallows.webp                  hero ambience overlay (was .svg — that
+                                 file was a raster-in-SVG wrapper, so
+                                 converting to WebP dropped 219→32 KB
+                                 with no visual change; universal browser
+                                 support means we don't need a fallback)
   apple-touch-icon.png           180×180 iOS home-screen icon
   og-image.png                   1200×630 social share image
   favicon.ico, robots.txt, sitemap.xml
