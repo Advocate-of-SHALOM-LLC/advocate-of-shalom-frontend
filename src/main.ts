@@ -1,6 +1,11 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { createHead } from '@unhead/vue';
+// @unhead/vue v2 moved the Vue-plugin-compatible createHead into the
+// /client subpath; the top-level @unhead/vue export now points at the
+// framework-agnostic createUnhead which isn't directly usable as
+// app.use(). GHSA-5339-hvwr-7582 (XSS in useHeadSafe) is patched at
+// unhead >= 2.1.11, only reachable via @unhead/vue 2.x.
+import { createHead } from '@unhead/vue/client';
 import * as Sentry from '@sentry/vue';
 import App from './App.vue';
 import router from './router';
