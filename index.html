@@ -11,15 +11,59 @@
     <meta name="description" content="Holistic advocacy for individuals navigating the criminal justice system, reentry, and complex government agencies — based in Grand Junction, Colorado." />
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Font stylesheet loaded async via print-media swap so it doesn't
-         block first paint. display=swap in the URL keeps text visible with
-         a fallback while custom fonts finish loading — the two-stack combo
-         is what moves LCP/FCP on mobile. -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" /></noscript>
+    <!-- Fonts self-hosted from /fonts/ — removes the DNS + TLS + extra
+         stylesheet round-trip to fonts.googleapis.com + fonts.gstatic.com.
+         Preload the 2 fonts on the critical path (400 body + 700 heading),
+         inline @font-face rules so no separate CSS request is needed. -->
+    <link rel="preload" href="/fonts/sourcesans3-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/playfairdisplay-700.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      /* Latin subset only (all we need for en-US). font-display: swap
+         keeps text visible with the system-font fallback while custom
+         faces finish loading. */
+      @font-face {
+        font-family: 'Source Sans 3';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('/fonts/sourcesans3-400.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Source Sans 3';
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url('/fonts/sourcesans3-600.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Source Sans 3';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url('/fonts/sourcesans3-700.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Playfair Display';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('/fonts/playfairdisplay-400.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Playfair Display';
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url('/fonts/playfairdisplay-600.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Playfair Display';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url('/fonts/playfairdisplay-700.woff2') format('woff2');
+      }
+    </style>
 
     <!-- Sanity CDN preconnect — every image on the site comes from here -->
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />

@@ -16,11 +16,11 @@
     # impractical for a Vite SPA + JSON-LD that changes per page.
     # Allowed external origins per resource type:
     #   - Sanity CMS: cdn.sanity.io (images), *.sanity.io (API)
-    #   - Fonts: fonts.googleapis.com (CSS), fonts.gstatic.com (files)
+    #   - Fonts: now self-hosted from /fonts/ — no external font origins needed
     #   - Analytics: sa.advocateofshalom.com (Simple Analytics tracker)
     #   - Video embeds: youtube.com, player.vimeo.com
     #   - Google Maps embed: www.google.com
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://sa.advocateofshalom.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://cdn.sanity.io https://sa.advocateofshalom.com; connect-src 'self' https://vi40cipr.api.sanity.io https://vi40cipr.apicdn.sanity.io https://*.ingest.us.sentry.io; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://sa.advocateofshalom.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://cdn.sanity.io https://sa.advocateofshalom.com; connect-src 'self' https://vi40cipr.api.sanity.io https://vi40cipr.apicdn.sanity.io https://*.ingest.us.sentry.io; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"
 
 [[headers]]
   for = "/assets/*"
