@@ -82,16 +82,22 @@ export function useSeo() {
 
   const canonicalUrl = computed(() => `${siteUrl}${route.path === '/' ? '' : route.path}`);
 
-  // Reactive JSON-LD — enriched with logo, image, description, areaServed,
-  // openingHours, and sameAs (populated from Sanity when social links load).
+  // Reactive JSON-LD — packages ProfessionalService, WebSite, and (where
+  // applicable) BreadcrumbList into a single schema.org @graph so Google
+  // sees the relationships between the site, the business, and the current
+  // page's position in the hierarchy. Using @graph over separate scripts
+  // is Google's recommended pattern when a page carries multiple entities.
   const jsonLd = computed(() => {
     const sameAs = (socialData.value ?? [])
       .map((s) => s?.url)
       .filter((u): u is string => typeof u === 'string' && u.length > 0);
 
-    const doc: Record<string, unknown> = {
-      '@context': 'https://schema.org',
+    const orgId = `${siteUrl}#organization`;
+    const websiteId = `${siteUrl}#website`;
+
+    const organization: Record<string, unknown> = {
       '@type': 'ProfessionalService',
+      '@id': orgId,
       name: siteName,
       url: siteUrl,
       description: siteDescription,
@@ -121,8 +127,49 @@ export function useSeo() {
       ],
     };
 
-    if (sameAs.length > 0) doc.sameAs = sameAs;
-    return doc;
+    if (sameAs.length > 0) organization.sameAs = sameAs;
+
+    const website = {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      name: siteName,
+      url: siteUrl,
+      publisher: { '@id': orgId },
+      inLanguage: 'en-US',
+    };
+
+    const graph: Array<Record<string, unknown>> = [organization, website];
+
+    // Breadcrumb only when we're not on the home page and the current
+    // route matches a known page. Skips 404 and dynamic slug routes
+    // where we'd otherwise emit a breadcrumb pointing at a title we
+    // don't know. Flat 2-level hierarchy (Home > Page) matches the
+    // site's structure — no nested categories.
+    const currentPage = pageMeta[route.path];
+    if (route.path !== '/' && currentPage) {
+      graph.push({
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: siteUrl,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: currentPage.title,
+            item: `${siteUrl}${route.path}`,
+          },
+        ],
+      });
+    }
+
+    return {
+      '@context': 'https://schema.org',
+      '@graph': graph,
+    };
   });
 
   useHead({
