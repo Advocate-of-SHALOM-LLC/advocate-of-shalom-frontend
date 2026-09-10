@@ -13,7 +13,13 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+    <!-- Font stylesheet loaded async via print-media swap so it doesn't
+         block first paint. display=swap in the URL keeps text visible with
+         a fallback while custom fonts finish loading — the two-stack combo
+         is what moves LCP/FCP on mobile. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" /></noscript>
 
     <!-- Sanity CDN preconnect — every image on the site comes from here -->
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />

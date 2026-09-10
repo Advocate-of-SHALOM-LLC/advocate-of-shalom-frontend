@@ -117,6 +117,11 @@ export function useSeo() {
         '@type': 'AdministrativeArea',
         name: 'Grand Valley, Colorado',
       },
+      // "Free consultation" phrasing tells Google + prospects the service
+      // is accessible without money as a first barrier. Rich Results flagged
+      // priceRange as missing (optional). "$" widely reads as "affordable
+      // range" without committing to a specific number.
+      priceRange: '$',
       openingHoursSpecification: [
         {
           '@type': 'OpeningHoursSpecification',
