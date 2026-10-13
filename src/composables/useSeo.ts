@@ -107,10 +107,10 @@ export function useSeo() {
       telephone: '9707735907',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '536 31 1/2 Rd #1',
+        streetAddress: '750 Main St, Ste. 105',
         addressLocality: 'Grand Junction',
         addressRegion: 'CO',
-        postalCode: '81504',
+        postalCode: '81501',
         addressCountry: 'US',
       },
       areaServed: {
