@@ -5,6 +5,7 @@ import SiteFooter from './SiteFooter.vue';
 import { useSeo } from '@/composables/useSeo';
 import { useSanity } from '@/composables/useSanity';
 import { useSiteStore } from '@/stores/useSiteStore';
+import { SITE_SETTINGS_QUERY, NAVIGATION_QUERY } from '@/composables/siteQueries';
 
 useSeo();
 
@@ -27,24 +28,7 @@ interface SiteSettings {
   craftedBy?: string;
 }
 
-// coalesce(logoLight, logo) lets legacy data on the old `logo` field still resolve
-// until the editor moves it to `logoLight`. Same for `logoDark` ← `darkLogo`.
-const { data: settings, loading: settingsLoading } = useSanity<SiteSettings>(
-  `*[_type == "siteSettings"][0]{
-    siteName,
-    "logoLight": coalesce(logoLight, logo){asset->{url}},
-    "logoDark": coalesce(logoDark, darkLogo){asset->{url}},
-    ctaLabel,
-    ctaUrl,
-    ctaHeadline,
-    ctaSubtext,
-    ctaFooterLabel,
-    ctaFooterUrl,
-    copyrightText,
-    description,
-    craftedBy
-  }`
-);
+const { data: settings, loading: settingsLoading } = useSanity<SiteSettings>(SITE_SETTINGS_QUERY);
 
 watch(settings, (s) => {
   if (!s) return;
@@ -66,9 +50,7 @@ watch(settings, (s) => {
 interface NavItem { label: string; url: string; isExternal?: boolean }
 interface NavDoc { navType: string; items: NavItem[] }
 
-const { data: navDocs, loading: navLoading } = useSanity<NavDoc[]>(
-  `*[_type == "navigation"]{navType, items[]{label, url, isExternal}}`
-);
+const { data: navDocs, loading: navLoading } = useSanity<NavDoc[]>(NAVIGATION_QUERY);
 
 watch(navDocs, (docs) => {
   if (!docs) return;

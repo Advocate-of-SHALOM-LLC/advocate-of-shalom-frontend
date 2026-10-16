@@ -32,6 +32,4 @@ export const sectionMap: Record<string, Component> = {
   teamProjectsSection: TeamProjectsSection,
 }
 
-/** GROQ query — just fetch the whole page document with sections */
-export const pageQuery = (slug: string) =>
-  `*[_type == "page" && slug.current == "${slug}"][0]{ title, "slug": slug.current, sections }`
+export { pageQuery } from './siteQueries'

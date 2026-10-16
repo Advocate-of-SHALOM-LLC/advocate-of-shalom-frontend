@@ -65,8 +65,11 @@
       }
     </style>
 
-    <!-- Sanity CDN preconnect — every image on the site comes from here -->
-    <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
+    <!-- Sanity preconnects — every image comes from the CDN, and every page's
+         content from the API, which main.ts asks for as soon as it runs.
+         (No crossorigin on the image host: images load without CORS.) -->
+    <link rel="preconnect" href="https://%VITE_SANITY_PROJECT_ID%.apicdn.sanity.io" crossorigin />
+    <link rel="preconnect" href="https://cdn.sanity.io" />
   </head>
   <body>
     <div id="app"></div>

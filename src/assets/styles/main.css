@@ -159,3 +159,13 @@
 .prose-cta p { margin-bottom: 1rem; }
 .prose-cta strong { font-weight: 600; }
 .prose-cta a { color: var(--color-primary); text-decoration: underline; }
+
+/* Keep the footer below the fold while a page's code or content is still
+   loading. Otherwise it is drawn right under the header and pushed down when
+   the content arrives, which Google counts as a large layout shift.
+   :empty ignores the comment placeholders Vue leaves behind. */
+#main-content:empty,
+#main-content > .page:empty {
+  min-height: 100dvh;
+}
+
