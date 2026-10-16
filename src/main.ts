@@ -45,8 +45,14 @@ if (sentryDsn) {
       .then(({ initSentry }) => initSentry(app, router, sentryDsn))
       .catch(() => {});
   };
+  // A few seconds after load, when the browser is idle: starting Sentry's
+  // recorder is one long task, and it shouldn't land while the page is
+  // still settling.
   const whenIdle = () =>
-    'requestIdleCallback' in window ? window.requestIdleCallback(startSentry, { timeout: 3000 }) : setTimeout(startSentry, 1000);
+    setTimeout(() => {
+      if ('requestIdleCallback' in window) window.requestIdleCallback(startSentry, { timeout: 3000 });
+      else startSentry();
+    }, 4000);
   if (document.readyState === 'complete') whenIdle();
   else window.addEventListener('load', whenIdle, { once: true });
 }

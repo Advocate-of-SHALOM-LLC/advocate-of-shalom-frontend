@@ -119,12 +119,9 @@ const ready = computed(() => !settingsLoading.value && !navLoading.value);
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  animation: layoutFadeIn 0.2s ease;
-}
-
-@keyframes layoutFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  /* No fade-in from opacity 0: Chrome doesn't count anything at zero opacity
+     as painted, so wherever the animation is held back (Google's speed test
+     at times) the page never "loads" at all — the test's NO_FCP error. */
 }
 
 .skip-link {
