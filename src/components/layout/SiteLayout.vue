@@ -30,11 +30,17 @@ interface SiteSettings {
 
 const { data: settings, loading: settingsLoading } = useSanity<SiteSettings>(SITE_SETTINGS_QUERY);
 
+// The logo is uploaded as a large original (1769×590 PNG, ~380 KB) but drawn
+// about 52px tall. Ask Sanity's image CDN for 160px tall (sharp on 3x
+// screens) in a modern format: a few KB instead of the original, which on a
+// phone connection was the slowest download on the page.
+const sizedLogo = (url: string) => `${url}?h=160&fit=max&auto=format`;
+
 watch(settings, (s) => {
   if (!s) return;
   if (s.siteName) site.name = s.siteName;
-  if (s.logoLight?.asset?.url) site.logoLight = s.logoLight.asset.url;
-  if (s.logoDark?.asset?.url) site.logoDark = s.logoDark.asset.url;
+  if (s.logoLight?.asset?.url) site.logoLight = sizedLogo(s.logoLight.asset.url);
+  if (s.logoDark?.asset?.url) site.logoDark = sizedLogo(s.logoDark.asset.url);
   if (s.ctaLabel) site.ctaLabel = s.ctaLabel;
   if (s.ctaUrl) site.ctaUrl = s.ctaUrl;
   if (s.ctaHeadline) site.ctaHeadline = s.ctaHeadline;
