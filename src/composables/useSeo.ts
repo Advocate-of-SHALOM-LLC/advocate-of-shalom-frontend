@@ -103,7 +103,7 @@ export function useSeo() {
       description: siteDescription,
       logo: `${siteUrl}/apple-touch-icon.png`,
       image: defaultImage,
-      email: 'navigator@advocateofshalom.com',
+      email: 'elyse@advocateofshalom.com',
       telephone: '9707735907',
       address: {
         '@type': 'PostalAddress',
