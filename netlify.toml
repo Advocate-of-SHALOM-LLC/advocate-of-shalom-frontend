@@ -17,10 +17,11 @@
     # Allowed external origins per resource type:
     #   - Sanity CMS: cdn.sanity.io (images), *.sanity.io (API)
     #   - Fonts: now self-hosted from /fonts/ — no external font origins needed
-    #   - Analytics: sa.advocateofshalom.com (Simple Analytics tracker)
+    #   - Analytics: scripts/queue.simpleanalyticscdn.com (Simple Analytics; the
+    #     sa.advocateofshalom.com custom domain failed TLS for many visitors)
     #   - Video embeds: youtube.com, player.vimeo.com
     #   - Google Maps embed: www.google.com
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://sa.advocateofshalom.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://cdn.sanity.io https://sa.advocateofshalom.com; connect-src 'self' https://vi40cipr.api.sanity.io https://vi40cipr.apicdn.sanity.io https://*.ingest.us.sentry.io; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://scripts.simpleanalyticscdn.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://cdn.sanity.io https://queue.simpleanalyticscdn.com; connect-src 'self' https://queue.simpleanalyticscdn.com https://vi40cipr.api.sanity.io https://vi40cipr.apicdn.sanity.io https://*.ingest.us.sentry.io; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"
 
 [[headers]]
   for = "/assets/*"
