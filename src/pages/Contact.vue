@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, nextTick } from 'vue';
 import { useSanity } from '@/composables/useSanity';
 import { useRevealObserver } from '@/composables/useRevealObserver';
 import { useSiteStore } from '@/stores/useSiteStore';
@@ -42,6 +42,23 @@ const form = reactive({
 const submitting = ref(false);
 const status = ref(/** @type {'idle'|'success'|'error'} */ ('idle'));
 const errorMessage = ref('');
+const sentPanel = ref(null);
+
+// The confirmation replaces the form, so bring it into view and move focus to
+// it — otherwise a visitor scrolled down sees the fields vanish and nothing else.
+async function showSent() {
+  status.value = 'success';
+  await nextTick();
+  const el = sentPanel.value;
+  if (!el) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  el.focus({ preventScroll: true });
+}
+
+function sendAnother() {
+  status.value = 'idle';
+}
 
 async function onSubmit() {
   if (submitting.value) return;
@@ -67,12 +84,13 @@ async function onSubmit() {
       throw new Error(body?.error || 'Something went wrong. Please try again.');
     }
 
-    status.value = 'success';
     form.name = '';
     form.email = '';
     form.phone = '';
     form.message = '';
     form.referralSource = '';
+    submitting.value = false;
+    await showSent();
   } catch (err) {
     status.value = 'error';
     errorMessage.value = err instanceof Error ? err.message : 'Something went wrong.';
@@ -106,7 +124,23 @@ const safeEmbedUrl = computed(() => {
           <h2 v-if="page?.contactHeading" class="text-3xl font-bold mb-2 text-(--color-text)">{{ page.contactHeading }}</h2>
           <p v-if="page?.contactSubheading" class="text-(--color-text-secondary) mb-6">{{ page.contactSubheading }}</p>
 
-          <form class="contact-form" novalidate @submit.prevent="onSubmit">
+          <div
+            v-if="status === 'success'"
+            ref="sentPanel"
+            role="status"
+            tabindex="-1"
+            class="contact-sent"
+          >
+            <svg class="contact-sent__icon" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="m8 12 3 3 5-6" />
+            </svg>
+            <p class="contact-sent__title">Thank you — your message has been sent.</p>
+            <p class="contact-sent__body">{{ page?.contactResponseNote || "We'll be in touch soon." }}</p>
+            <button type="button" class="contact-sent__again focus-ring" @click="sendAnother">Send another message</button>
+          </div>
+
+          <form v-else class="contact-form" novalidate @submit.prevent="onSubmit">
             <div class="contact-form__row">
               <label class="contact-form__field">
                 <span class="contact-form__label">Name <span aria-hidden="true" class="contact-form__required">*</span></span>
@@ -170,10 +204,7 @@ const safeEmbedUrl = computed(() => {
               <p v-if="page?.contactResponseNote" class="contact-form__note">{{ page.contactResponseNote }}</p>
             </div>
 
-            <div v-if="status === 'success'" role="status" class="contact-form__status contact-form__status--success">
-              Thank you — your message is on its way. We'll be in touch soon.
-            </div>
-            <div v-else-if="status === 'error'" role="alert" class="contact-form__status contact-form__status--error">
+            <div v-if="status === 'error'" role="alert" class="contact-form__status contact-form__status--error">
               {{ errorMessage || 'Something went wrong sending your message. Please try again.' }}
             </div>
           </form>
@@ -403,10 +434,54 @@ const safeEmbedUrl = computed(() => {
   line-height: 1.5;
 }
 
-.contact-form__status--success {
-  background-color: var(--color-success-light);
-  color: var(--color-success);
+/* ─── Sent confirmation (replaces the form) ─────────────────────────── */
+.contact-sent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background-color: var(--color-bg-card);
   border: 1px solid color-mix(in srgb, var(--color-success) 35%, transparent);
+  border-top: 4px solid var(--color-success);
+  border-radius: var(--border-radius);
+  scroll-margin: 6rem;
+}
+
+.contact-sent:focus {
+  outline: none;
+}
+
+.contact-sent__icon {
+  color: var(--color-success);
+}
+
+.contact-sent__title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.contact-sent__body {
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 32rem;
+  line-height: 1.5;
+}
+
+.contact-sent__again {
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0.25rem 0;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
 .contact-form__status--error {
