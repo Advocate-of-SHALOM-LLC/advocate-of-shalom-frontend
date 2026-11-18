@@ -11,25 +11,25 @@
   },
   "dependencies": {
     "@portabletext/vue": "^1.0.14",
-    "@sanity/image-url": "^2.1.1",
-    "@sentry/node": "^10.74.0",
-    "@sentry/vue": "^10.74.0",
+    "@sanity/image-url": "^2.2.0",
+    "@sentry/node": "^10.78.0",
+    "@sentry/vue": "^10.78.0",
     "@unhead/vue": "^2.1.17",
     "@vueuse/core": "^12.8.2",
     "lucide-vue-next": "^0.474.0",
     "pinia": "^2.3.1",
-    "resend": "^6.27.0",
-    "vue": "^3.5.42",
-    "vue-router": "^4.6.4"
+    "resend": "^6.38.1",
+    "vue": "^3.5.45",
+    "vue-router": "^4.6.5"
   },
   "devDependencies": {
     "@netlify/functions": "^5.3.0",
-    "@sentry/vite-plugin": "^5.4.0",
-    "@tailwindcss/vite": "^4.3.3",
+    "@sentry/vite-plugin": "^5.4.1",
+    "@tailwindcss/vite": "^4.3.5",
     "@vitejs/plugin-vue": "^5.2.4",
-    "tailwindcss": "^4.3.3",
+    "tailwindcss": "^4.3.5",
     "typescript": "~5.7.3",
-    "vite": "^6.4.3",
+    "vite": "^6.4.6",
     "vue-tsc": "^2.2.12"
   }
 }
