@@ -1,6 +1,7 @@
 import type { Context } from '@netlify/functions';
 import { Resend } from 'resend';
 import { initSentry, captureError } from '../lib/sentry';
+import { storeConfigured, storeSubmission } from '../lib/submissions';
 
 initSentry();
 
@@ -45,41 +46,36 @@ export default async (req: Request, _context: Context) => {
           </tr>`
         : '';
 
-    const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: TO_EMAIL,
-      replyTo: email,
-      subject: `New message from ${name} via advocateofshalom.com`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #0e7490; margin-bottom: 24px;">New Contact Form Submission</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="padding: 8px 12px; font-weight: 600; color: #4b5563; vertical-align: top; width: 160px;">Name</td>
-              <td style="padding: 8px 12px; color: #1f2937;">${escapeHtml(name)}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 12px; font-weight: 600; color: #4b5563; vertical-align: top;">Email</td>
-              <td style="padding: 8px 12px; color: #1f2937;"><a href="mailto:${escapeHtml(email)}" style="color: #0e7490;">${escapeHtml(email)}</a></td>
-            </tr>
-            ${optionalRow('Phone', phone)}
-            ${optionalRow('How they heard about us', referralSource)}
-            <tr>
-              <td style="padding: 8px 12px; font-weight: 600; color: #4b5563; vertical-align: top;">Message</td>
-              <td style="padding: 8px 12px; color: #1f2937; white-space: pre-wrap;">${escapeHtml(message)}</td>
-            </tr>
-          </table>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-          <p style="font-size: 12px; color: #9ca3af;">Sent from the contact form on advocateofshalom.com</p>
-        </div>
-      `,
-    });
+    // A message goes two places: the dashboard's Form Submissions inbox and an
+    // email. They run side by side, and either one alone still delivers it, so
+    // one failing must not fail the visitor's send.
+    const store = () =>
+      storeSubmission({
+        formSlug: 'contact',
+        formTitle: 'Contact message',
+        pagePath: '/contact',
+        fields: [
+          { label: 'Name', name: 'name', value: name },
+          { label: 'Email', name: 'email', value: email },
+          ...(phone ? [{ label: 'Phone', name: 'phone', value: phone }] : []),
+          { label: 'Message', name: 'message', value: message },
+          ...(referralSource ? [{ label: 'How they heard about us', name: 'referralSource', value: referralSource }] : []),
+        ],
+      });
 
-    if (error) {
-      console.error('Resend error:', error);
+    const [stored, emailed] = await Promise.allSettled([
+      storeConfigured() ? store() : Promise.reject(new Error('not configured')),
+      sendEmail(),
+    ]);
+    if (storeConfigured() && stored.status === 'rejected') {
+      console.error('Storing the submission failed:', stored.reason);
+      await captureError(stored.reason, { function: 'send-message', stage: 'dashboard.store' });
+    }
+    if (emailed.status === 'rejected') {
+      console.error('Resend error:', emailed.reason);
       // Resend rejected the send — this is a real production incident
       // (API key rotated, sender domain unverified, quota exceeded, etc).
-      await captureError(error, {
+      await captureError(emailed.reason, {
         function: 'send-message',
         stage: 'resend.send',
         // Don't include the message body — sensitive user content.
@@ -87,6 +83,9 @@ export default async (req: Request, _context: Context) => {
         to: TO_EMAIL,
         from: FROM_EMAIL,
       });
+    }
+
+    if (stored.status === 'rejected' && emailed.status === 'rejected') {
       return new Response(JSON.stringify({ error: 'Failed to send message. Please try again.' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -97,6 +96,40 @@ export default async (req: Request, _context: Context) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
+
+    async function sendEmail() {
+      const { error } = await resend.emails.send({
+        from: FROM_EMAIL,
+        to: TO_EMAIL,
+        replyTo: email,
+        subject: `New message from ${name} via advocateofshalom.com`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #0e7490; margin-bottom: 24px;">New Contact Form Submission</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 12px; font-weight: 600; color: #4b5563; vertical-align: top; width: 160px;">Name</td>
+                <td style="padding: 8px 12px; color: #1f2937;">${escapeHtml(name)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 12px; font-weight: 600; color: #4b5563; vertical-align: top;">Email</td>
+                <td style="padding: 8px 12px; color: #1f2937;"><a href="mailto:${escapeHtml(email)}" style="color: #0e7490;">${escapeHtml(email)}</a></td>
+              </tr>
+              ${optionalRow('Phone', phone)}
+              ${optionalRow('How they heard about us', referralSource)}
+              <tr>
+                <td style="padding: 8px 12px; font-weight: 600; color: #4b5563; vertical-align: top;">Message</td>
+                <td style="padding: 8px 12px; color: #1f2937; white-space: pre-wrap;">${escapeHtml(message)}</td>
+              </tr>
+            </table>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+            <p style="font-size: 12px; color: #9ca3af;">Sent from the contact form on advocateofshalom.com</p>
+          </div>
+        `,
+      });
+
+      if (error) throw error;
+    }
   } catch (err) {
     console.error('Send message error:', err);
     // Any uncaught exception here is a bug worth waking someone up for —
